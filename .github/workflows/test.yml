@@ -1,0 +1,39 @@
+name: Send GitHub Release Links to Telegram (Manual)
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  send_links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get latest release info from external repo
+        id: release
+        run: |
+          REPO="abhinandh-s/revanced-extended"
+          latest=$(curl -s https://api.github.com/repos/$REPO/releases/latest)
+
+          tag=$(echo "$latest" | jq -r '.tag_name')
+          assets=$(echo "$latest" | jq -c '.assets[] | {name: .name, url: .browser_download_url}')
+
+          {
+            echo "tag=$tag" >> $GITHUB_ENV
+            echo 'assets<<EOF' >> $GITHUB_ENV
+            echo "$assets" >> $GITHUB_ENV
+            echo 'EOF' >> $GITHUB_ENV
+          }
+
+      - name: Send release links to Telegram
+        run: |
+          message="🚀 New Release: *${tag}*\n\n"
+          while IFS= read -r asset; do
+            name=$(echo "$asset" | jq -r '.name')
+            url=$(echo "$asset" | jq -r '.url')
+            message+="🔗 [$name]($url)\n"
+          done <<< "${assets}"
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d text="$message" \
+            -d parse_mode="Markdown"
