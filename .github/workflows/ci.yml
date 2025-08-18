@@ -1,7 +1,8 @@
 name: Send APKs to Telegram (Manual)
 
 on:
-  workflow_dispatch:   # run manually
+  workflow_dispatch:
+  push:
 
 jobs:
   send_apks:
@@ -11,12 +12,15 @@ jobs:
         id: release
         run: |
           REPO="abhinandh-s/revanced-extended"
-          # fetch latest release info
           latest=$(curl -s https://api.github.com/repos/$REPO/releases/latest)
 
-          # extract download URLs of assets
           urls=$(echo "$latest" | jq -r '.assets[].browser_download_url')
-          echo "urls=$urls" >> $GITHUB_ENV
+
+          {
+            echo 'urls<<EOF'
+            echo "$urls"
+            echo 'EOF'
+          } >> $GITHUB_ENV
 
       - name: Download APKs
         run: |
