@@ -26,9 +26,9 @@ jobs:
 
       - name: Send release links to Telegram
         run: |
-          message="🚀 New Release: *${tag}*\n\n"$'\n'
+          message="🚀 New Release: *${tag}*"$'\n'$'\n'
           for url in $urls; do
-            message+="🔗 [Download]($url)\n"
+            message+="🔗 [Download]($url)"$'\n'
           done
 
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
