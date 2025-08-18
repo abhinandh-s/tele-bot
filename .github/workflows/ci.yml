@@ -1,32 +1,35 @@
 name: Send APKs to Telegram (Manual)
 
 on:
-  workflow_dispatch:   # manual trigger
+  workflow_dispatch:   # run manually
 
 jobs:
   send_apks:
     runs-on: ubuntu-latest
     steps:
-      - name: Get latest release info (external repo)
+      - name: Get latest release info from external repo
         id: release
         run: |
-          # Replace with external repo owner/name
           REPO="abhinandh-s/revanced-extended"
+          # fetch latest release info
           latest=$(curl -s https://api.github.com/repos/$REPO/releases/latest)
-          echo "urls=$(echo $latest | jq -r '.assets[].browser_download_url')" >> $GITHUB_ENV
+
+          # extract download URLs of assets
+          urls=$(echo "$latest" | jq -r '.assets[].browser_download_url')
+          echo "urls=$urls" >> $GITHUB_ENV
 
       - name: Download APKs
         run: |
-          mkdir apks
+          mkdir -p apks
           for url in $urls; do
-            echo "Downloading $url"
+            echo "Downloading: $url"
             curl -L -o "apks/$(basename $url)" "$url"
           done
 
       - name: Send APKs to Telegram
         run: |
           for apk in apks/*.apk; do
-            echo "Sending $apk to Telegram..."
+            echo "Uploading: $apk"
             curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendDocument" \
               -F chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
               -F document="@${apk}"
