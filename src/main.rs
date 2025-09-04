@@ -77,7 +77,7 @@ async fn send_to_telegram(token: &str, chat_id: &str, release: &Release) -> anyh
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let repo = "abhinandh-s/revanced-extended";
+    let repo = "NoName-exe/revanced-extended";
     let prev_path = "prev.json";
 
     // Secrets from env vars
