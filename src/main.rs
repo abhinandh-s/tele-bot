@@ -60,7 +60,7 @@ async fn send_to_telegram(token: &str, chat_id: &str, release: &Release) -> anyh
 
 /* curl -L --http1.1 -A "Mozilla/5.0" -o youtube-revanced-extended-v19.47.53-all.apk \
   https://github.com/NoName-exe/revanced-extended/releases/download/136/youtube-revanced-extended-v19.47.53-all.apk */
-        message.push_str(&format!("🔗 [{}](curl -L --http1.1 -A "Mozilla/5.0" -o {} \ {})\n", asset.name, asset.name, asset.browser_download_url));
+        message.push_str(&format!("🔗 [{}](curl -L --http1.1 -A \"Mozilla/5.0\" -o {} \\ {})\n", asset.name, asset.name, asset.browser_download_url));
 
 
     }
