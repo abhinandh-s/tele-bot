@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
   schedule:
-    - cron: "0 0 * * *"   # weekly on Sunday UTC
+    - cron: "0 0 * * *"   # daily midnight UTC
 
 permissions:
   contents: write    # allows pushing changes back to the repo
