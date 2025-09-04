@@ -1,0 +1,43 @@
+name: Release Notifier
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 0"   # weekly on Sunday UTC
+
+permissions:
+  contents: write    # allows pushing changes back to the repo
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build notifier
+        run: cargo build --release
+
+      - name: Run notifier
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: ./target/release/release_notifier
+
+      - name: Commit and push prev.json if changed
+        run: |
+          if [[ -n "$(git status --porcelain prev.json)" ]]; then
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git add prev.json
+            git commit -m "Update prev.json [skip ci]"
+            git push
+          else
+            echo "No change in prev.json"
+          fi
