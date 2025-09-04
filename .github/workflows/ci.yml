@@ -3,6 +3,8 @@ name: Send GitHub Release Links to Telegram
 on:
   workflow_dispatch:
   push:
+    schedule:
+    - cron: "0 0 * * 0"   # Runs weekly on Sunday at 00:00 UTC
 
 jobs:
   send_links:
