@@ -3,7 +3,7 @@ name = "tele-bot"
 version = "0.1.0"
 edition = "2021"
 
-[[dependencies]
+[dependencies]
 reqwest = { version = "0.12", features = ["json", "native-tls"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
