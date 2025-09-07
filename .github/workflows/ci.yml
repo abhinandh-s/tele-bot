@@ -54,7 +54,7 @@ jobs:
       - name: Job B running
         run: echo "Prev.json was updated, running Job B"
       - name: starting
-      - run: echo "This only runs if the last commit came from a GitHub Action."
+        run: echo "This only runs if the last commit came from a GitHub Action."
       - uses: actions/checkout@v3
 
       - name: Upload files to Telegram
