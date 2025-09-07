@@ -14,7 +14,7 @@ jobs:
         to-who: 'abhinandh_s'
         message: 'Here are your files!'
         files: |
-        /assets/**/*
+          /assets/**/*
 
       env:
         API_ID: ${{ secrets.API_ID }}
