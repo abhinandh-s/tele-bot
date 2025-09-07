@@ -182,14 +182,14 @@ async fn download_asset(client: &Client, url: &str, dir: &str, filename: &str) -
     let resp = client.get(url).send().await?;
     let bytes = resp.bytes().await?;
     let path = Path::new(dir).join(filename);
-    fs::write(&path, &bytes).await?;
+    tokio::fs::write(&path, &bytes).await?;
     Ok(())
 }
 
 async fn download_assets_concurrent(repo: &str, release: &Release) -> anyhow::Result<Vec<String>> {
     let client = Client::new();
     let dir = format!("assets/{}", repo.replace("/", "_"));
-    fs::create_dir_all(&dir).await?;
+    tokio::fs::create_dir_all(&dir).await?;
 
     let mut tasks = Vec::new();
     let mut file_paths = Vec::new();
