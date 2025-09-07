@@ -66,5 +66,5 @@ jobs:
           path: assets/
       - run: |
             echo "Job UPLOAD running because RUN said yes"    
-            ls -la
-            # ls assets
+            ls -a
+            ls assets
