@@ -1,6 +1,7 @@
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::{fs, path::Path};
+use std::collections::HashMap;
 
 #[derive(Debug, Deserialize, Serialize)]
 struct Asset {
