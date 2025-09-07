@@ -1,7 +1,7 @@
 {
   "repos": {
-    "NoName-exe/revanced-extended": "136",
     "ProtonMail/android-mail": "4.15.0(11782)",
-    "ReadYouApp/ReadYou": "0.15.2"
+    "ReadYouApp/ReadYou": "0.15.2",
+    "NoName-exe/revanced-extended": "136"
   }
 }
