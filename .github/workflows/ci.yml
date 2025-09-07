@@ -10,60 +10,19 @@ permissions:
   contents: write
 
 jobs:
-  a:
+  run:
     runs-on: ubuntu-latest
-    outputs:
-      pushed: ${{ steps.check_push.outputs.changed }}
-
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Build notifier
-        run: cargo build --release
-
-      - name: Run notifier
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: ./target/release/tele-bot
-
-      - name: Check and push prev.json
-        id: check_push
+      - run: echo "Job A running"
+      - id: set
         run: |
-          if [[ -n "$(git status --porcelain prev.json)" ]]; then
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "github-actions[bot]@users.noreply.github.com"
-            git add prev.json
-            git commit -m "Update prev.json" || echo "No changes to commit"
-            git push origin HEAD:master --force-with-lease
-            echo "changed=yes" >> $GITHUB_OUTPUT
-          else
-            echo "changed=no" >> $GITHUB_OUTPUT
-          fi
-
-  b:
-    runs-on: ubuntu-latest
-    needs: a
-    if: needs.a.outputs.pushed == 'yes'
-    steps:
-      - name: Job B running
-        run: echo "Prev.json was updated, running Job B"
-
-      - name: Upload files to Telegram
-        uses: xz-dev/TelegramFileUploader@v1.1.1
-        with:
-          to-who: 'abhinandh_s'
-          message: 'Here are your files!'
-          files: |
-            /assets/*
-
-        env:
-          API_ID: ${{ secrets.API_ID }}
-          API_HASH: ${{ secrets.API_HASH }}
-          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          echo "decide=yes" >> $GITHUB_OUTPUT
+    outputs:
+      run_b: ${{ steps.set.outputs.decide }}
+ 
+   b:
+     runs-on: ubuntu-latest
+     needs: run
+     if: always() && needs.a.outputs.run_b == 'yes'
+     steps:
+       - run: echo "Job B running because A said yes"    
