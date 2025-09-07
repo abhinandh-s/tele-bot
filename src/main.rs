@@ -68,7 +68,7 @@ async fn process_repos(token: &str, chat_id: &str, repos: Vec<&str>) -> anyhow::
 
         println!("New release found for {}: {}", repo, release.tag_name);
 
-        crate::download_assets_concurrent(&repo, &release).await?;
+        download_assets_concurrent(&repo, &release).await?;
 
         let mut message = format!("🚀 New Release from *{}*: *{}*\n\n", repo, release.tag_name);
         let mut sent_text = false;
