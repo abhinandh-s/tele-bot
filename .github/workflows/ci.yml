@@ -13,10 +13,37 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Job RUN running"
-      - id: set
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build notifier
+        run: cargo build --release
+
+      - name: Run notifier
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: ./target/release/tele-bot
+
+      - name: Commit and push prev.json if changed
         run: |
-          echo "decide=no" >> $GITHUB_OUTPUT
+            if [[ -n "$(git status --porcelain prev.json)" ]]; then
+              git config --global user.name "github-actions[bot]"
+              git config --global user.email "github-actions[bot]@users.noreply.github.com"
+              git add prev.json
+              git commit -m "Update prev.json" || echo "No changes to commit"
+              git push origin HEAD:master --force
+echo "decide=yes" >> $GITHUB_OUTPUT
+            else
+              echo "No change in prev.json"
+echo "decide=no" >> $GITHUB_OUTPUT
+            fi
+      
     outputs:
       run_upload: ${{ steps.set.outputs.decide }}
  
