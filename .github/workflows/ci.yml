@@ -39,6 +39,7 @@ jobs:
               git add prev.json
               git commit -m "Update prev.json" || echo "No changes to commit"
               git push origin HEAD:master --force
+              cat assets/list.txt
               echo "decide=yes" >> $GITHUB_OUTPUT
             else
               echo "No change in prev.json"
