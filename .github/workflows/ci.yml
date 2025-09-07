@@ -41,7 +41,7 @@ jobs:
             git config --global user.email "github-actions[bot]@users.noreply.github.com"
             git add prev.json
             git commit -m "Update prev.json" || echo "No changes to commit"
-            git push origin HEAD:master --force
+            git push origin HEAD:master --force-with-lease
             echo "changed=yes" >> $GITHUB_OUTPUT
           else
             echo "changed=no" >> $GITHUB_OUTPUT
