@@ -29,10 +29,6 @@ async fn fetch_latest_release(repo: &str) -> anyhow::Result<Release> {
     Ok(release)
 }
 
-use reqwest::Client;
-use std::collections::HashMap;
-use serde::{Deserialize, Serialize};
-
 #[derive(Debug, Deserialize, Serialize)]
 struct Prev {
     repos: HashMap<String, String>, // repo -> last seen tag
