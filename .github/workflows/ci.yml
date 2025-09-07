@@ -45,6 +45,7 @@ jobs:
             echo "changed=yes" >> $GITHUB_OUTPUT
           else
             echo "changed=no" >> $GITHUB_OUTPUT
+          fi
 
   b:
     runs-on: ubuntu-latest
@@ -53,9 +54,6 @@ jobs:
     steps:
       - name: Job B running
         run: echo "Prev.json was updated, running Job B"
-      - name: starting
-        run: echo "This only runs if the last commit came from a GitHub Action."
-      - uses: actions/checkout@v3
 
       - name: Upload files to Telegram
         uses: xz-dev/TelegramFileUploader@v1.1.1
