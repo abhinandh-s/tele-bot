@@ -49,16 +49,6 @@ fn save_prev(path: &str, prev: &Prev) -> anyhow::Result<()> {
     Ok(())
 }
 
-/// Get Content-Length of an asset
-async fn fetch_asset_size(client: &Client, url: &str) -> anyhow::Result<u64> {
-    let resp = client.head(url).send().await?;
-    if let Some(len) = resp.headers().get(reqwest::header::CONTENT_LENGTH) {
-        Ok(len.to_str()?.parse::<u64>()?)
-    } else {
-        Ok(0)
-    }
-}
-
 async fn process_repos(token: &str, chat_id: &str, repos: Vec<&str>) -> anyhow::Result<()> {
     let client = Client::new();
     let prev_path = "prev.json";
