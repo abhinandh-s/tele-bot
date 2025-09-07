@@ -54,42 +54,28 @@ jobs:
     outputs:
       run_upload: ${{ steps.set.outputs.decide }}
  
-  upload:
-    runs-on: ubuntu-latest
-    needs: run
-    if: always() && needs.run.outputs.run_upload == 'yes'
-    steps:
-      - name: Download assets
-        uses: actions/download-artifact@v4
-        with:
-          name: assets
-          path: assets/
-      - run: |
-            echo "Job UPLOAD running because RUN said yes"    
-            ls -a
-            ls assets/ProtonMail_android-mail
-      - run: echo "This only runs if the last commit came from a GitHub Action."
-      - uses: actions/checkout@v3
+upload:
+  runs-on: ubuntu-latest
+  needs: run
+  if: always() && needs.run.outputs.run_upload == 'yes'
+  steps:
+    - name: Download assets
+      uses: actions/download-artifact@v4
+      with:
+        name: assets
+        path: assets/
 
-      - name: Upload files to Telegram
-        uses: xz-dev/TelegramFileUploader@v1.1.1
-        with:
-          to-who: 'abhinandh_s'
-          message: 'Here are your files!'
-          files: |
-            /assets/**/*
-
-        env:
-          API_ID: ${{ secrets.API_ID }}
-          API_HASH: ${{ secrets.API_HASH }}
-          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      - name: Upload files
+    - name: Upload all files to Telegram
+      env:
+        API_ID: ${{ secrets.API_ID }}
+        API_HASH: ${{ secrets.API_HASH }}
+        BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       run: |
-  for file in assets/**/*; do
-    [ -f "$file" ] || continue
-    echo "Uploading $file..."
-    gh workflow run xz-dev/TelegramFileUploader@v1 -- \
-      --to-who 'username' \
-      --message 'Here is your file' \
-      --files "$file"
-  done
+        for file in assets/**/*; do
+          [ -f "$file" ] || continue
+          echo "Uploading $file..."
+          python3 -m xz_dev.TelegramFileUploader \
+            --to-who 'abhinandh_s' \
+            --message 'Here is your file' \
+            --files "$file"
+        done
