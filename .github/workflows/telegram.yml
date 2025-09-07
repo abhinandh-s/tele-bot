@@ -1,7 +1,10 @@
 name: Upload Files to Telegram
 
 on:
-  push:
+  workflow_run:
+    workflows: [Run Tests]
+    types:
+      - completed
     paths:
       - 'prev.json'
 jobs:
