@@ -46,7 +46,7 @@ jobs:
             fi
       - name: Upload assets
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: assets
           path: assets/
@@ -60,7 +60,7 @@ jobs:
     if: always() && needs.run.outputs.run_upload == 'yes'
     steps:
       - name: Download assets
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: assets
           path: assets/
