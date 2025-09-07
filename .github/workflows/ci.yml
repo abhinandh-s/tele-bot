@@ -53,4 +53,7 @@ jobs:
     needs: run
     if: always() && needs.run.outputs.run_upload == 'yes'
     steps:
-      - run: echo "Job UPLOAD running because RUN said yes"    
+      - run: |
+            echo "Job UPLOAD running because RUN said yes"    
+            ls 
+            ls assets
