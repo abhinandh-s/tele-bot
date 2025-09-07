@@ -59,23 +59,14 @@ jobs:
     needs: run
     if: always() && needs.run.outputs.run_upload == 'yes'
     steps:
-      - name: Download assets
-        uses: actions/download-artifact@v4
+      - name: Upload files from list.txt to Telegram
+        uses: xz-dev/TelegramFileUploader@v1.1.1
         with:
-          name: assets
-          path: assets/
-
-      - name: Upload all files to Telegram
+        to-who: 'abhinandh_s'
+        message: 'Here are your files!'
+        files: |
+              $(cat assets/list.txt)
         env:
           API_ID: ${{ secrets.API_ID }}
           API_HASH: ${{ secrets.API_HASH }}
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        run: |
-          for file in assets/**/*; do
-            [ -f "$file" ] || continue
-            echo "Uploading $file..."
-            python3 -m xz_dev.TelegramFileUploader \
-            --to-who 'abhinandh_s' \
-            --message 'Here is your file' \
-            --files "$file"
-          done
