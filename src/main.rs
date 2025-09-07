@@ -217,5 +217,12 @@ async fn download_assets_concurrent(repo: &str, release: &Release) -> anyhow::Re
         t.await??;
     }
 
+// Write the file list
+    let mut list_file = tokio::fs::File::create("assets/list.txt").await?;
+    for path in &file_paths {
+        list_file.write_all(path.as_bytes()).await?;
+        list_file.write_all(b"\n").await?;
+    }
+
     Ok(file_paths)
 }
