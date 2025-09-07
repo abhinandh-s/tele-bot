@@ -191,6 +191,10 @@ async fn download_assets_concurrent(repo: &str, release: &Release) -> anyhow::Re
     let dir = format!("assets/{}", repo.replace("/", "_"));
     tokio::fs::create_dir_all(&dir).await?;
 
+    // Clear previous list.txt before downloads
+    let list_path = "assets/list.txt";
+    tokio::fs::write(list_path, "").await.unwrap_or(());
+
     let mut tasks = Vec::new();
     let mut file_paths = Vec::new();
 
