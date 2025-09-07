@@ -55,5 +55,5 @@ jobs:
     steps:
       - run: |
             echo "Job UPLOAD running because RUN said yes"    
-            ls 
-            ls assets
+            ls -la
+            # ls assets
