@@ -53,3 +53,19 @@ jobs:
     steps:
       - name: Job B running
         run: echo "Prev.json was updated, running Job B"
+      - name: starting
+      - run: echo "This only runs if the last commit came from a GitHub Action."
+      - uses: actions/checkout@v3
+
+      - name: Upload files to Telegram
+        uses: xz-dev/TelegramFileUploader@v1.1.1
+        with:
+          to-who: 'abhinandh_s'
+          message: 'Here are your files!'
+          files: |
+            /assets/**/*
+
+        env:
+          API_ID: ${{ secrets.API_ID }}
+          API_HASH: ${{ secrets.API_HASH }}
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
