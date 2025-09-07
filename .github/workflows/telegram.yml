@@ -9,7 +9,7 @@ jobs:
     - uses: actions/checkout@v3
     
     - name: Upload files to Telegram
-      uses: xz-dev/TelegramFileUploader@v1
+      uses: xz-dev/TelegramFileUploader@v1.1.1
       with:
         to-who: 'abhinandh_s'
         message: 'Here are your files!'
