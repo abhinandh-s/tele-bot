@@ -44,6 +44,12 @@ jobs:
               echo "No change in prev.json"
               echo "decide=no" >> $GITHUB_OUTPUT
             fi
+      - name: Upload assets
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: assets
+          path: assets/
       
     outputs:
       run_upload: ${{ steps.set.outputs.decide }}
@@ -53,6 +59,11 @@ jobs:
     needs: run
     if: always() && needs.run.outputs.run_upload == 'yes'
     steps:
+      - name: Download assets
+        uses: actions/download-artifact@v3
+        with:
+          name: assets
+          path: assets/
       - run: |
             echo "Job UPLOAD running because RUN said yes"    
             ls -la
