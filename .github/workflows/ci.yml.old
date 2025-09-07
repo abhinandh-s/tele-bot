@@ -23,4 +23,4 @@ jobs:
     if: needs.check.outputs.changed == 'true'
     runs-on: ubuntu-latest
     steps:
-      - run: echo "prev.json was changed"
+      - run: echo "prev.json was changed!"
