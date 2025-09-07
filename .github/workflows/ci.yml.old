@@ -4,38 +4,23 @@ on:
   workflow_dispatch:
   push:
     schedule:
-    - cron: "0 0 * * 0"   # Runs weekly on Sunday at 00:00 UTC
+    - cron: "0 0 * * 0"   
 
 jobs:
-  send_links:
+  check:
     runs-on: ubuntu-latest
     steps:
-      - name: Get latest release info from external repo
-        id: release
+      - uses: actions/checkout@v4
+      - id: filecheck
         run: |
-          REPO="abhinandh-s/revanced-extended"
-          latest=$(curl -s https://api.github.com/repos/$REPO/releases/latest)
-
-          tag=$(echo "$latest" | jq -r '.tag_name')
-          assets=$(echo "$latest" | jq -c '.assets[] | {name: .name, url: .browser_download_url}')
-
-          {
-            echo "tag=$tag" >> $GITHUB_ENV
-            echo 'assets<<EOF' >> $GITHUB_ENV
-            echo "$assets" >> $GITHUB_ENV
-            echo 'EOF' >> $GITHUB_ENV
-          }
-
-      - name: Send release links to Telegram
-        run: |
-          message="🚀 New Release: *${tag}*"$'\n'$'\n'
-          while IFS= read -r asset; do
-            name=$(echo "$asset" | jq -r '.name')
-            url=$(echo "$asset" | jq -r '.url')
-            message+="🔗 [$name]($url)"$'\n'
-          done <<< "${assets}"
-
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-            -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
-            -d text="$message" \
-            -d parse_mode="Markdown"
+          if git diff --name-only HEAD^ HEAD | grep -q 'prev.json'; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+  do-something:
+    needs: check
+    if: needs.check.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "prev.json was changed"
