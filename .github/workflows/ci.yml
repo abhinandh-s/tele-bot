@@ -1,4 +1,4 @@
-name: Release Notifier
+name: Releaser
 
 on:
   workflow_dispatch:
