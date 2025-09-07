@@ -13,16 +13,16 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Job A running"
+      - run: echo "Job RUN running"
       - id: set
         run: |
           echo "decide=yes" >> $GITHUB_OUTPUT
     outputs:
-      run_b: ${{ steps.set.outputs.decide }}
+      run_upload: ${{ steps.set.outputs.decide }}
  
-  b:
+  upload:
     runs-on: ubuntu-latest
     needs: run
-    if: always() && needs.a.outputs.run_b == 'yes'
+    if: always() && needs.run.outputs.run_upload == 'yes'
     steps:
-      - run: echo "Job B running because A said yes"    
+      - run: echo "Job UPLOAD running because RUN said yes"    
