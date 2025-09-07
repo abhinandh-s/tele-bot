@@ -10,7 +10,7 @@ async fn download_asset(client: &Client, url: &str, dir: &str, filename: &str) -
     Ok(())
 }
 
-async fn download_assets_concurrent(repo: &str, release: &Release) -> anyhow::Result<Vec<String>> {
+async pub fn download_assets_concurrent(repo: &str, release: &Release) -> anyhow::Result<Vec<String>> {
     let client = Client::new();
     let dir = format!("assets/{}", repo.replace("/", "_"));
     fs::create_dir_all(&dir).await?;
