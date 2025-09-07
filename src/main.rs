@@ -149,7 +149,7 @@ async fn main() -> anyhow::Result<()> {
 
     let repos = vec![
         "NoName-exe/revanced-extended",
-        "rust-lang/rust", // just example
+        "ReadYouApp/ReadYou", // just example
     ];
 
     process_repos(&telegram_token, &telegram_chat_id, repos).await?;
