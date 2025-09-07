@@ -60,6 +60,7 @@ jobs:
     if: always() && needs.run.outputs.run_upload == 'yes'
     steps:
       - name: Upload files from list.txt to Telegram
+        run: cat assets/list.txt
         uses: xz-dev/TelegramFileUploader@v1.1.1
         with:
           to-who: 'abhinandh_s'
