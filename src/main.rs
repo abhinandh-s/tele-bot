@@ -16,11 +16,6 @@ struct Release {
     assets: Vec<Asset>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-struct Prev {
-    tag_name: String,
-}
-
 async fn fetch_latest_release(repo: &str) -> anyhow::Result<Release> {
     let url = format!("https://api.github.com/repos/{}/releases/latest", repo);
     let client = Client::new();
@@ -34,21 +29,109 @@ async fn fetch_latest_release(repo: &str) -> anyhow::Result<Release> {
     Ok(release)
 }
 
-fn load_prev(path: &str) -> Option<Prev> {
-    if Path::new(path).exists() {
-        let data = fs::read_to_string(path).ok()?;
-        serde_json::from_str(&data).ok()
+use reqwest::Client;
+use std::collections::HashMap;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Deserialize, Serialize)]
+struct Prev {
+    repos: HashMap<String, String>, // repo -> last seen tag
+}
+
+fn load_prev(path: &str) -> Prev {
+    if std::path::Path::new(path).exists() {
+        let data = std::fs::read_to_string(path).unwrap_or_default();
+        serde_json::from_str(&data).unwrap_or_else(|_| Prev { repos: Default::default() })
     } else {
-        None
+        Prev { repos: Default::default() }
     }
 }
 
-fn save_prev(path: &str, release: &Release) -> anyhow::Result<()> {
-    let prev = Prev {
-        tag_name: release.tag_name.clone(),
-    };
-    let json = serde_json::to_string_pretty(&prev)?;
-    fs::write(path, json)?;
+fn save_prev(path: &str, prev: &Prev) -> anyhow::Result<()> {
+    let json = serde_json::to_string_pretty(prev)?;
+    std::fs::write(path, json)?;
+    Ok(())
+}
+
+/// Get Content-Length of an asset
+async fn fetch_asset_size(client: &Client, url: &str) -> anyhow::Result<u64> {
+    let resp = client.head(url).send().await?;
+    if let Some(len) = resp.headers().get(reqwest::header::CONTENT_LENGTH) {
+        Ok(len.to_str()?.parse::<u64>()?)
+    } else {
+        Ok(0)
+    }
+}
+
+async fn process_repos(token: &str, chat_id: &str, repos: Vec<&str>) -> anyhow::Result<()> {
+    let client = Client::new();
+    let prev_path = "prev.json";
+    let mut prev = load_prev(prev_path);
+
+    for repo in repos {
+        let release = fetch_latest_release(repo).await?;
+
+        // Skip if already processed
+        if let Some(last_tag) = prev.repos.get(repo) {
+            if last_tag == &release.tag_name {
+                println!("No new release for {} ({}). Skipping.", repo, last_tag);
+                continue;
+            }
+        }
+
+        println!("New release found for {}: {}", repo, release.tag_name);
+
+        let mut message = format!("🚀 New Release from *{}*: *{}*\n\n", repo, release.tag_name);
+        let mut sent_text = false;
+
+        for asset in &release.assets {
+            let size = fetch_asset_size(&client, &asset.browser_download_url).await.unwrap_or(0);
+
+            if size > 0 && size <= 50 * 1024 * 1024 {
+                // send as Telegram file
+                let url = format!("https://api.telegram.org/bot{}/sendDocument", token);
+                let form = reqwest::multipart::Form::new()
+                    .text("chat_id", chat_id.to_string())
+                    .part(
+                        "document",
+                        reqwest::multipart::Part::stream(
+                            client.get(&asset.browser_download_url).send().await?.bytes().await?,
+                        )
+                        .file_name(asset.name.clone()),
+                    )
+                    .text("caption", format!("{} ({:.2} MB)", asset.name, size as f64 / 1024.0 / 1024.0));
+
+                client.post(&url).multipart(form).send().await?;
+            } else {
+                // add to text message
+                message.push_str(&format!("🔗 [{}]({})\n", asset.name, asset.browser_download_url));
+                message.push_str(&format!(
+                    "\n🧲 curl command:\n```\ncurl -L --http1.1 -A \"Mozilla/5.0\" -o {} {}\n```\n",
+                    asset.name, asset.browser_download_url
+                ));
+                sent_text = true;
+            }
+        }
+
+        // Send text message if needed
+        if sent_text {
+            let url = format!("https://api.telegram.org/bot{}/sendMessage", token);
+            client
+                .post(&url)
+                .form(&[
+                    ("chat_id", chat_id),
+                    ("text", &message),
+                    ("parse_mode", "Markdown"),
+                ])
+                .send()
+                .await?;
+        }
+
+        // update prev.json for this repo
+        prev.repos.insert(repo.to_string(), release.tag_name.clone());
+    }
+
+    save_prev(prev_path, &prev)?;
     Ok(())
 }
 
@@ -86,58 +169,6 @@ async fn send_to_telegram(token: &str, chat_id: &str, release: &Release) -> anyh
         ])
         .send()
         .await?;
-
-    Ok(())
-}
-
-/// New multi-repo handler
-async fn process_repos(token: &str, chat_id: &str, repos: Vec<&str>) -> anyhow::Result<()> {
-    let client = Client::new();
-
-    for repo in repos {
-        let release = fetch_latest_release(repo).await?;
-        let mut message = format!("🚀 New Release from *{}*: *{}*\n\n", repo, release.tag_name);
-
-        for asset in &release.assets {
-            let size = fetch_asset_size(&client, &asset.browser_download_url).await.unwrap_or(0);
-            if size > 0 && size <= 50 * 1024 * 1024 {
-                // under 50MB: upload as file
-                let url = format!("https://api.telegram.org/bot{}/sendDocument", token);
-                let form = reqwest::multipart::Form::new()
-                    .text("chat_id", chat_id.to_string())
-                    .part(
-                        "document",
-                        reqwest::multipart::Part::stream(
-                            client.get(&asset.browser_download_url).send().await?.bytes().await?,
-                        )
-                        .file_name(asset.name.clone()),
-                    )
-                    .text("caption", format!("{} ({:.2} MB)", asset.name, size as f64 / 1024.0 / 1024.0));
-                client.post(&url).multipart(form).send().await?;
-            } else {
-                // over 50MB: just send link + curl
-                message.push_str(&format!("🔗 [{}]({})\n", asset.name, asset.browser_download_url));
-                message.push_str(&format!(
-                    "\n🧲 curl command:\n```\ncurl -L --http1.1 -A \"Mozilla/5.0\" -o {} {}\n```\n",
-                    asset.name, asset.browser_download_url
-                ));
-            }
-        }
-
-        // send text message if we didn’t upload all assets as files
-        if !message.trim().is_empty() {
-            let url = format!("https://api.telegram.org/bot{}/sendMessage", token);
-            client
-                .post(&url)
-                .form(&[
-                    ("chat_id", chat_id),
-                    ("text", &message),
-                    ("parse_mode", "Markdown"),
-                ])
-                .send()
-                .await?;
-        }
-    }
 
     Ok(())
 }
