@@ -1,0 +1,22 @@
+name: Upload Files to Telegram
+
+on: [push]
+
+jobs:
+  upload-to-telegram:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Upload files to Telegram
+      uses: xz-dev/TelegramFileUploader@v1
+      with:
+        to-who: 'abhinandh_s'
+        message: 'Here are your files!'
+        files: |
+        /assets/**/*
+
+      env:
+        API_ID: ${{ secrets.API_ID }}
+        API_HASH: ${{ secrets.API_HASH }}
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
