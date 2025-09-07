@@ -1,7 +1,9 @@
 name: Upload Files to Telegram
 
-on: [push]
-
+on:
+  push:
+    paths:
+      - 'prev.json'
 jobs:
   upload-to-telegram:
     runs-on: ubuntu-latest
