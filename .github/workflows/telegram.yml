@@ -2,8 +2,15 @@ name: Upload Files to Telegram
 
 on:
   push:
-    paths:
-      - 'prev.json'
+ 
+
+jobs:
+  only-if-bot:
+    if: github.event.workflow_run.head_commit.author.name == 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "This only runs if the last commit came from a GitHub Action."
+
 jobs:
   upload-to-telegram:
     runs-on: ubuntu-latest
