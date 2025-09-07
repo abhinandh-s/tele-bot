@@ -16,7 +16,7 @@ jobs:
       - run: echo "Job RUN running"
       - id: set
         run: |
-          echo "decide=yes" >> $GITHUB_OUTPUT
+          echo "decide=no" >> $GITHUB_OUTPUT
     outputs:
       run_upload: ${{ steps.set.outputs.decide }}
  
