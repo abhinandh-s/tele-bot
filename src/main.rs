@@ -171,7 +171,8 @@ async fn main() -> anyhow::Result<()> {
     let repos = vec![
         "NoName-exe/revanced-extended",
         "ReadYouApp/ReadYou",
-        "ProtonMail/android-mail"
+        "ProtonMail/android-mail",
+        "Helium314/HeliBoard"
     ];
 
     process_repos(&telegram_token, &telegram_chat_id, repos).await?;
