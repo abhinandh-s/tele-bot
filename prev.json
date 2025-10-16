@@ -1,8 +1,8 @@
 {
   "repos": {
-    "NoName-exe/revanced-extended": "138",
     "Helium314/HeliBoard": "v3.4",
+    "ReadYouApp/ReadYou": "0.15.2",
     "ProtonMail/android-mail": "v7.0.13",
-    "ReadYouApp/ReadYou": "0.15.2"
+    "NoName-exe/revanced-extended": "138"
   }
 }
