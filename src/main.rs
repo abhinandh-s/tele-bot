@@ -172,7 +172,8 @@ async fn main() -> anyhow::Result<()> {
         "NoName-exe/revanced-extended",
         "ReadYouApp/ReadYou",
         "ProtonMail/android-mail",
-        "Helium314/HeliBoard"
+        "Helium314/HeliBoard",
+        "Akylas/OSS-DocumentScanner"
     ];
 
     process_repos(&telegram_token, &telegram_chat_id, repos).await?;
