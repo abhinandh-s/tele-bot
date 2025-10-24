@@ -1,10 +1,10 @@
 {
   "repos": {
+    "NoName-exe/revanced-extended": "138",
     "ReadYouApp/ReadYou": "0.15.2",
     "Helium314/HeliBoard": "v3.5",
     "ProtonMail/android-mail": "v7.0.15",
     "Akylas/OSS-DocumentScanner": "com.akylas.cardwallet/android/github/1.7.2/45",
-    "NoName-exe/revanced-extended": "138",
     "foobnix/LibreraReader": "9.0.5"
   }
 }
