@@ -1,10 +1,10 @@
 {
   "repos": {
-    "ProtonMail/android-mail": "v7.0.15",
     "ReadYouApp/ReadYou": "0.15.3",
+    "ProtonMail/android-mail": "v7.0.15",
     "NoName-exe/revanced-extended": "138",
     "Helium314/HeliBoard": "v3.5",
-    "Akylas/OSS-DocumentScanner": "com.akylas.cardwallet/android/github/1.7.2/45",
-    "foobnix/LibreraReader": "9.0.5"
+    "foobnix/LibreraReader": "9.0.5",
+    "Akylas/OSS-DocumentScanner": "com.akylas.cardwallet/android/github/1.7.2/45"
   }
 }
