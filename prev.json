@@ -1,11 +1,11 @@
 {
   "repos": {
-    "ReadYouApp/ReadYou": "0.15.3",
     "Akylas/OSS-DocumentScanner": "com.akylas.cardwallet/android/github/1.7.2/45",
-    "Helium314/HeliBoard": "v3.5",
+    "ReadYouApp/ReadYou": "0.15.3",
     "ProtonMail/android-mail": "v7.2.1",
     "uazo/cromite": "v142.0.7444.138-851be9370b90564ca9522f0531d661ca276f73b9",
     "NoName-exe/revanced-extended": "139",
-    "foobnix/LibreraReader": "9.0.5"
+    "foobnix/LibreraReader": "9.0.5",
+    "Helium314/HeliBoard": "v3.5"
   }
 }
