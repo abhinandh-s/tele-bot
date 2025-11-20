@@ -174,8 +174,7 @@ async fn main() -> anyhow::Result<()> {
         "ProtonMail/android-mail",
         "Helium314/HeliBoard",
         "Akylas/OSS-DocumentScanner",
-        "foobnix/LibreraReader",
-        "uazo/cromite"
+        "foobnix/LibreraReader"
     ];
 
     process_repos(&telegram_token, &telegram_chat_id, repos).await?;
