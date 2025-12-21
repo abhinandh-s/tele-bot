@@ -1,11 +1,11 @@
 {
   "repos": {
-    "ProtonMail/android-mail": "v7.4.1",
-    "foobnix/LibreraReader": "9.1.35",
-    "Akylas/OSS-DocumentScanner": "com.akylas.cardwallet/android/github/1.7.4/47",
+    "ReadYouApp/ReadYou": "0.15.3",
     "Helium314/HeliBoard": "v3.6",
-    "uazo/cromite": "v142.0.7444.176-2124fd8aa7d29dd6e1b38d5514916881d7566992",
+    "Akylas/OSS-DocumentScanner": "com.akylas.cardwallet/android/github/1.7.5/48",
     "NoName-exe/revanced-extended": "139",
-    "ReadYouApp/ReadYou": "0.15.3"
+    "foobnix/LibreraReader": "9.1.35",
+    "uazo/cromite": "v142.0.7444.176-2124fd8aa7d29dd6e1b38d5514916881d7566992",
+    "ProtonMail/android-mail": "v7.4.1"
   }
 }
