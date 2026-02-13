@@ -1,8 +1,8 @@
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
-use std::{fs, path::Path};
 use std::collections::HashMap;
 use std::io::Write;
+use std::{fs, path::Path};
 
 #[derive(Debug, Deserialize, Serialize)]
 struct Asset {
@@ -32,27 +32,30 @@ async fn fetch_latest_release(repo: &str) -> anyhow::Result<Release> {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-struct Prev {
+struct PrevVersion {
     repos: HashMap<String, String>, // repo -> last seen tag
 }
 
-fn load_prev(path: &str) -> Prev {
+fn load_prev(path: &str) -> PrevVersion {
     if std::path::Path::new(path).exists() {
         let data = std::fs::read_to_string(path).unwrap_or_default();
-        serde_json::from_str(&data).unwrap_or_else(|_| Prev { repos: Default::default() })
+        serde_json::from_str(&data).unwrap_or_else(|_| PrevVersion {
+            repos: Default::default(),
+        })
     } else {
-        Prev { repos: Default::default() }
+        PrevVersion {
+            repos: Default::default(),
+        }
     }
 }
 
-fn save_prev(path: &str, prev: &Prev) -> anyhow::Result<()> {
+fn save_prev(path: &str, prev: &PrevVersion) -> anyhow::Result<()> {
     let json = serde_json::to_string_pretty(prev)?;
     std::fs::write(path, json)?;
     Ok(())
 }
 
-async fn process_repos(token: &str, chat_id: &str, repos: Vec<&str>) -> anyhow::Result<()> {
-    let client = Client::new();
+async fn process_repos(repos: Vec<&str>) -> anyhow::Result<()> {
     let prev_path = "prev.json";
     let mut prev = load_prev(prev_path);
 
@@ -69,120 +72,39 @@ async fn process_repos(token: &str, chat_id: &str, repos: Vec<&str>) -> anyhow::
 
         println!("New release found for {}: {}", repo, release.tag_name);
 
-        download_assets_concurrent(&repo, &release).await?;
-
-        let mut message = format!("🚀 New Release from *{}*: *{}*\n\n", repo, release.tag_name);
-        let mut sent_text = false;
-
-        for asset in &release.assets {
-            let size = fetch_asset_size(&client, &asset.browser_download_url).await.unwrap_or(0);
-
-            if size > 0 && size <= 50 * 1024 * 1024 {
-                // send as Telegram file
-                let url = format!("https://api.telegram.org/bot{}/sendDocument", token);
-                let form = reqwest::multipart::Form::new()
-                    .text("chat_id", chat_id.to_string())
-                    .part(
-                        "document",
-                        reqwest::multipart::Part::stream(
-                            client.get(&asset.browser_download_url).send().await?.bytes().await?,
-                        )
-                        .file_name(asset.name.clone()),
-                    )
-                    .text("caption", format!("{} ({:.2} MB)", asset.name, size as f64 / 1024.0 / 1024.0));
-
-                client.post(&url).multipart(form).send().await?;
-            } else {
-                // add to text message
-                message.push_str(&format!("🔗 [{}]({})\n", asset.name, asset.browser_download_url));
-                message.push_str(&format!(
-                    "\n🧲 curl command:\n```\ncurl -L --http1.1 -A \"Mozilla/5.0\" -o {} {}\n```\n",
-                    asset.name, asset.browser_download_url
-                ));
-                sent_text = true;
-            }
-        }
-
-        // Send text message if needed
-        if sent_text {
-            let url = format!("https://api.telegram.org/bot{}/sendMessage", token);
-            client
-                .post(&url)
-                .form(&[
-                    ("chat_id", chat_id),
-                    ("text", &message),
-                    ("parse_mode", "Markdown"),
-                ])
-                .send()
-                .await?;
-        }
+        download_assets_concurrent(repo, &release).await?;
 
         // update prev.json for this repo
-        prev.repos.insert(repo.to_string(), release.tag_name.clone());
+        prev.repos
+            .insert(repo.to_string(), release.tag_name.clone());
     }
 
     save_prev(prev_path, &prev)?;
     Ok(())
 }
 
-/// Helper: get Content-Length of an asset
-async fn fetch_asset_size(client: &Client, url: &str) -> anyhow::Result<u64> {
-    let resp = client.head(url).send().await?;
-    if let Some(len) = resp.headers().get(reqwest::header::CONTENT_LENGTH) {
-        Ok(len.to_str()?.parse::<u64>()?)
-    } else {
-        Ok(0) // fallback if GitHub hides size
-    }
-}
-
-/// Old single-release notifier
-async fn send_to_telegram(token: &str, chat_id: &str, release: &Release) -> anyhow::Result<()> {
-    let mut message = format!("🚀 New Release: *{}*\n\n", release.tag_name);
-
-    for asset in &release.assets {
-        message.push_str(&format!("🔗 [{}]({})\n", asset.name, asset.browser_download_url));
-        message.push_str(&format!(
-            "\n🧲 curl command:\n```\ncurl -L --http1.1 -A \"Mozilla/5.0\" -o {} {}\n```\n",
-            asset.name, asset.browser_download_url
-        ));
-    }
-
-    let url = format!("https://api.telegram.org/bot{}/sendMessage", token);
-
-    let client = Client::new();
-    client
-        .post(&url)
-        .form(&[
-            ("chat_id", chat_id),
-            ("text", &message),
-            ("parse_mode", "Markdown"),
-        ])
-        .send()
-        .await?;
-
-    Ok(())
-}
-
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let telegram_token = std::env::var("TELEGRAM_BOT_TOKEN")?;
-    let telegram_chat_id = std::env::var("TELEGRAM_CHAT_ID")?;
-
     let repos = vec![
         "NoName-exe/revanced-extended",
-       // "ReadYouApp/ReadYou",
+        "ReadYouApp/ReadYou",
         "ProtonMail/android-mail",
-      //  "Helium314/HeliBoard",
-      //  "Akylas/OSS-DocumentScanner",
-      //  "foobnix/LibreraReader"
+        "Helium314/HeliBoard",
+        "Akylas/OSS-DocumentScanner",
+        "foobnix/LibreraReader",
     ];
 
-    process_repos(&telegram_token, &telegram_chat_id, repos).await?;
+    process_repos(repos).await?;
 
     Ok(())
 }
 
-async fn download_asset(client: &Client, url: &str, dir: &str, filename: &str) -> anyhow::Result<()> {
+async fn download_asset(
+    client: &Client,
+    url: &str,
+    dir: &str,
+    filename: &str,
+) -> anyhow::Result<()> {
     let resp = client.get(url).send().await?;
     let bytes = resp.bytes().await?;
     let path = Path::new(dir).join(filename);
@@ -203,6 +125,9 @@ async fn download_assets_concurrent(repo: &str, release: &Release) -> anyhow::Re
     let mut file_paths = Vec::new();
 
     for asset in &release.assets {
+        if asset.name.contains("magisk") || asset.name.contains("arm-v7a") {
+            continue;
+        }
         let url = asset.browser_download_url.clone();
         let filename = asset.name.clone();
         let path = format!("{}/{}", dir, filename);
