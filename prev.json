@@ -1,4 +1,11 @@
 {
   "repos": {
+    "Akylas/OSS-DocumentScanner": "com.akylas.documentscanner/android/github/1.16.9/132",
+    "NoName-exe/revanced-extended": "140",
+    "Helium314/HeliBoard": "v3.6",
+    "emavgl/oinkoin": "1.4.2",
+    "ProtonMail/android-mail": "7.7.1(16244)",
+    "ReadYouApp/ReadYou": "0.16.1",
+    "foobnix/LibreraReader": "9.3.55"
   }
 }
