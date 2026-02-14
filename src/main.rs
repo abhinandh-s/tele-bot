@@ -4,6 +4,23 @@ use std::collections::HashMap;
 use std::io::Write;
 use std::{fs, path::Path};
 
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    let repos = vec![
+        "NoName-exe/revanced-extended",
+        "ReadYouApp/ReadYou",
+        "ProtonMail/android-mail",
+        "Helium314/HeliBoard",
+        "Akylas/OSS-DocumentScanner",
+        "foobnix/LibreraReader",
+        "emavgl/oinkoin",
+    ];
+
+    process_repos(repos).await?;
+
+    Ok(())
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 struct Asset {
     name: String,
@@ -80,22 +97,6 @@ async fn process_repos(repos: Vec<&str>) -> anyhow::Result<()> {
     }
 
     save_prev(prev_path, &prev)?;
-    Ok(())
-}
-
-#[tokio::main]
-async fn main() -> anyhow::Result<()> {
-    let repos = vec![
-        "NoName-exe/revanced-extended",
-        "ReadYouApp/ReadYou",
-        "ProtonMail/android-mail",
-        "Helium314/HeliBoard",
-        "Akylas/OSS-DocumentScanner",
-        "foobnix/LibreraReader",
-    ];
-
-    process_repos(repos).await?;
-
     Ok(())
 }
 
