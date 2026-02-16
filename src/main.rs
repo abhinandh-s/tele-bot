@@ -14,6 +14,7 @@ async fn main() -> anyhow::Result<()> {
         "Akylas/OSS-DocumentScanner",
         "foobnix/LibreraReader",
         "emavgl/oinkoin",
+        "ReVanced/revanced-manager",
     ];
 
     process_repos(repos).await?;
