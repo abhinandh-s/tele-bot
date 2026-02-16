@@ -15,6 +15,7 @@ async fn main() -> anyhow::Result<()> {
         "foobnix/LibreraReader",
         "emavgl/oinkoin",
         "ReVanced/revanced-manager",
+        "ReVanced/GmsCore",
     ];
 
     process_repos(repos).await?;
