@@ -16,6 +16,7 @@ async fn main() -> anyhow::Result<()> {
         "emavgl/oinkoin",
         "ReVanced/revanced-manager",
         "ReVanced/GmsCore",
+        "T8RIN/ImageToolbox",
     ];
 
     process_repos(repos).await?;
