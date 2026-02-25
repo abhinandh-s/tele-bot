@@ -17,6 +17,7 @@ async fn main() -> anyhow::Result<()> {
         "ReVanced/revanced-manager",
         "ReVanced/GmsCore",
         "T8RIN/ImageToolbox",
+        "uazo/cromite",
     ];
 
     process_repos(repos).await?;
