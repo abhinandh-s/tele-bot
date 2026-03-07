@@ -1,15 +1,15 @@
 {
   "repos": {
-    "T8RIN/ImageToolbox": "3.7.0",
-    "Akylas/OSS-DocumentScanner": "com.akylas.cardwallet/android/github/1.10.1/60",
-    "foobnix/LibreraReader": "9.3.63",
     "ReVanced/GmsCore": "v0.3.13.2.250932",
-    "Helium314/HeliBoard": "v3.7",
-    "ReVanced/revanced-manager": "v1.25.1",
     "emavgl/oinkoin": "1.5.0",
     "ReadYouApp/ReadYou": "0.16.1",
+    "ReVanced/revanced-manager": "v1.25.1",
     "NoName-exe/revanced-extended": "140",
+    "uazo/cromite": "v145.0.7632.120-d133d52d09c925b6542ff00e368d18d74df85e7c",
+    "Helium314/HeliBoard": "v3.7",
+    "foobnix/LibreraReader": "9.3.63",
     "ProtonMail/android-mail": "7.7.1(16244)",
-    "uazo/cromite": "v145.0.7632.120-d133d52d09c925b6542ff00e368d18d74df85e7c"
+    "T8RIN/ImageToolbox": "3.7.0",
+    "Akylas/OSS-DocumentScanner": "com.akylas.documentscanner/android/github/1.19.1/140"
   }
 }
